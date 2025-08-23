@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PAMP Gold Rate Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1a1a2e;
+            --secondary-color: #4361ee;
+            --accent-color: #3a0ca3;
+            --gradient-start: #7209b7;
+            --gradient-end: #4361ee;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text-color: #1a1a2e;
+            --light-text: #f8f9fa;
+            --border-color: rgba(0, 0, 0, 0.1);
+            --success-color: #4cc9f0;
+            --header-bg: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e0e6ef 100%);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border-radius: 24px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+        
+        header {
+            background: var(--header-bg);
+            color: var(--light-text);
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, transparent 30%, rgba(255, 255, 255, 0.1) 70%);
+            transform: rotate(30deg);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+            font-weight: 800;
+            position: relative;
+            letter-spacing: -0.5px;
+        }
+        
+        .header-desc {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+            font-weight: 400;
+            position: relative;
+        }
+        
+        .calculator-container {
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        .input-section {
+            background: var(--glass-bg);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            justify-content: center;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .input-group label {
+            font-weight: 600;
+            color: var(--text-color);
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .input-group select, .input-group input {
+            padding: 16px 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 16px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .input-group select {
+            width: 220px;
+        }
+        
+        .input-group input {
+            width: 160px;
+            text-align: center;
+        }
+        
+        select:focus, input:focus {
+            border-color: var(--secondary-color);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 16px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-md);
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        button:hover::before {
+            left: 100%;
+        }
+        
+        button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(67, 97, 238, 0.3);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .results-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        .result-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s ease;
+        }
+        
+        .result-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .result-card h3 {
+            color: var(--text-color);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+        
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding: 12px 0;
+        }
+        
+        .result-item:not(:last-child) {
+            border-bottom: 1px dashed #eee;
+        }
+        
+        .result-value {
+            font-weight: 700;
+            color: var(--secondary-color);
+            font-size: 17px;
+        }
+        
+        .total-price {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--success-color);
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            background: linear-gradient(135deg, #f8fff9 0%, #e6f7ff 100%);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .datetime {
+            font-size: 14px;
+            color: #7f8c8d;
+            text-align: right;
+            margin-top: 20px;
+            font-style: italic;
+        }
+        
+        .certificate-section {
+            background: var(--glass-bg);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-sm);
+            display: none;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+        }
+        
+        .certificate-section.visible {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .certificate-section h3 {
+            color: var(--text-color);
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+        
+        .certificate-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+            gap: 20px;
+        }
+        
+        .certificate-item {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 20px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s ease;
+        }
+        
+        .certificate-item:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .certificate-item label {
+            font-weight: 600;
+            color: var(--text-color);
+            font-size: 15px;
+        }
+        
+        .certificate-item input {
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 15px;
+            text-align: center;
+            transition: all 0.3s;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .certificate-item input:focus {
+            border-color: var(--secondary-color);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.15);
+        }
+        
+        .history-section {
+            background: var(--glass-bg);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+        }
+        
+        .history-section h3 {
+            color: var(--text-color);
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+        
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .history-table th, .history-table td {
+            padding: 18px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .history-table th {
+            background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+            color: white;
+            font-weight: 600;
+            font-size: 15px;
+        }
+        
+        .history-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .history-table tr:hover {
+            background-color: #f1f9ff;
+        }
+        
+        .history-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: #7f8c8d;
+            border-top: 1px solid #eee;
+            font-size: 14px;
+            background: #f8f9fa;
+        }
+        
+        /* Modern animations and effects */
+        .glow {
+            animation: glow 2s infinite alternate;
+        }
+        
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 10px -10px var(--secondary-color);
+            }
+            to {
+                box-shadow: 0 0 20px 0px var(--secondary-color);
+            }
+        }
+        
+        /* Responsive design */
+        @media (max-width: 1024px) {
+            .input-section {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .input-group select, .input-group input {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .action-buttons {
+                justify-content: center;
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .results-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .certificate-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .history-table {
+                font-size: 14px;
+            }
+            
+            .history-table th, .history-table td {
+                padding: 12px 10px;
+            }
+            
+            .total-price {
+                font-size: 1.6rem;
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-gem"></i> PAMP Gold Rate Calculator</h1>
+            <p class="header-desc">Calculate the total cost of PAMP gold bars based on weight, premium, and certificate charges</p>
+        </header>
+        
+        <div class="calculator-container">
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="item-select"><i class="fas fa-cube"></i> Select Gold Item:</label>
+                    <select id="item-select">
+                        <option value="1gm">1 GM</option>
+                        <option value="2.5gm">2.5 GM</option>
+                        <option value="5gm">5 GM</option>
+                        <option value="10gm">10 GM</option>
+                        <option value="20gm">20 GM</option>
+                        <option value="50gm">50 GM</option>
+                        <option value="100gm">100 GM</option>
+                        <option value="halfoz">1/2 OZ</option>
+                        <option value="1oz">1 OZ</option>
+                        <option value="1tola">1 TOLA</option>
+                        <option value="2tola">2 TOLA</option>
+                        <option value="3tola">3 TOLA</option>
+                        <option value="5tola">5 TOLA</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="baseValue"><i class="fas fa-database"></i> Base Value:</label>
+                    <input type="number" id="baseValue" value="3333">
+                </div>
+                
+                <div class="input-group">
+                    <label for="premium"><i class="fas fa-chart-line"></i> Premium:</label>
+                    <input type="number" id="premium" value="10">
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="secondary" id="toggle-certificate-btn">
+                        <i class="fas fa-edit"></i> Edit Certificates
+                    </button>
+                    <button id="calculate-btn" class="glow">
+                        <i class="fas fa-calculator"></i> Calculate
+                    </button>
+                </div>
+            </div>
+            
+            <div class="results-section">
+                <div class="result-card">
+                    <h3><i class="fas fa-info-circle"></i> Input Details</h3>
+                    <div class="result-item">
+                        <span>Base Value:</span>
+                        <span class="result-value" id="display-base-value">3333</span>
+                    </div>
+                    <div class="result-item">
+                        <span>Premium:</span>
+                        <span class="result-value" id="display-premium">10</span>
+                    </div>
+                    <div class="result-item">
+                        <span>Certificate Charge:</span>
+                        <span class="result-value" id="certificate-charge">35</span>
+                    </div>
+                </div>
+                
+                <div class="result-card">
+                    <h3><i class="fas fa-calculator"></i> Calculation Results</h3>
+                    <div class="result-item">
+                        <span>Selected Item:</span>
+                        <span class="result-value" id="item-name">1 GM</span>
+                    </div>
+                    <div class="result-item">
+                        <span>Weight (grams):</span>
+                        <span class="result-value" id="item-weight">1</span>
+                    </div>
+                    <div class="result-item">
+                        <span>AED per gram:</span>
+                        <span class="result-value" id="aed-gram">395.03</span>
+                    </div>
+                    <div class="result-item">
+                        <span>Certificate Charge:</span>
+                        <span class="result-value" id="certificate-value">35</span>
+                    </div>
+                    <div class="total-price">
+                        <span>Total Price (AED):</span>
+                        <span id="total-price">430.03</span>
+                    </div>
+                    <div class="datetime" id="calculation-datetime">
+                        Calculated on: <span id="current-datetime"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="certificate-section" id="certificate-section">
+                <h3><i class="fas fa-edit"></i> Edit Certificate Charges</h3>
+                <div class="certificate-grid">
+                    <div class="certificate-item">
+                        <label for="cert-1gm">1 GM:</label>
+                        <input type="number" id="cert-1gm" value="35" min="0">
+                    </div>
+                    <div class="certificate-item">
+                        <label for="cert-2.5gm">2.5 GM:</label>
+                        <input type="number" id="cert-2.5gm" value="40" min="0">
+                    </div>
+                    <div class="certificate-item">
+                        <label for="cert-5gm">5 GM:</label>
+                        <input type="number" id="cert-5gm" value="50" min="0">
+                    </div>
+                    <div class="certificate-item">
+                        <label for="cert-10gm">10 GM:</label>
+                        <input type="number" id="cert-10gm" value="60" min="0">
+                    </div>
+                    <div class="certificate-item">
+                        <label for="cert-20gm">20 GM:</label>
+                        <input type="number" id="cert-20gm" value="70" min="0">
+                    </div>
+                    <div class="certificate-item">
+                        <label for="cert-50gm">50 GM:</label>
+                        <input type="number" id="cert-50gm" value="125" min="0">
+                    </div>
+                    <div class="certificate-item">
+                        <label for="cert-100gm">100 GM:</label>
+                        <input type="number" id="cert-100gm" value="140" min="0">
+                    </div>
+                    <div class="certificate-item">
+                        <label for="cert-halfoz">1/2 OZ:</label>
+                        <input type="number" id="cert-halfoz" value="70" min="0">
+                    </div>
+                    <div class="certificate-item">
+                        <label for="cert-1oz">1 OZ:</label>
+                        <input type="number" id="cert-1oz" value="160" min="0">
+                    </div>
+                    <div class="certificate-item">
+                        <label for="cert-1tola">1 TOLA:</label>
+                        <input type="number" id="cert-1tola" value="60" min="0">
+                    </div>
+                    <div class="certificate-item">
+                        <label for="cert-2tola">2 TOLA:</label>
+                        <input type="number" id="cert-2tola" value="70" min="0">
+                    </div>
+                    <div class="certificate-item">
+                        <label for="cert-3tola">3 TOLA:</label>
+                        <input type="number" id="cert-3tola" value="80" min="0">
+                    </div>
+                    <div class="certificate-item">
+                        <label for="cert-5tola">5 TOLA:</label>
+                        <input type="number" id="cert-5tola" value="120" min="0">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="history-section">
+                <h3><i class="fas fa-history"></i> Calculation History</h3>
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Date & Time</th>
+                            <th>Item</th>
+                            <th>Base Value</th>
+                            <th>Premium</th>
+                            <th>Certificate</th>
+                            <th>Total (AED)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-body">
+                        <!-- History rows will be added here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <footer>
+            <p><i class="far fa-copyright"></i> 2025 PAMP Gold Rate Calculator | Precious Metals Calculation System - ASNIF</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const calculateBtn = document.getElementById('calculate-btn');
+            const baseValueInput = document.getElementById('baseValue');
+            const premiumInput = document.getElementById('premium');
+            const itemSelect = document.getElementById('item-select');
+            const toggleCertificateBtn = document.getElementById('toggle-certificate-btn');
+            const certificateSection = document.getElementById('certificate-section');
+            const historyBody = document.getElementById('history-body');
+            const currentDatetime = document.getElementById('current-datetime');
+            
+            // Define item data
+            const items = {
+                '1gm': { name: '1 GM', weight: 1, certificate: 35 },
+                '2.5gm': { name: '2.5 GM', weight: 2.5, certificate: 40 },
+                '5gm': { name: '5 GM', weight: 5, certificate: 50 },
+                '10gm': { name: '10 GM', weight: 10, certificate: 60 },
+                '20gm': { name: '20 GM', weight: 20, certificate: 70 },
+                '50gm': { name: '50 GM', weight: 50, certificate: 125 },
+                '100gm': { name: '100 GM', weight: 100, certificate: 140 },
+                'halfoz': { name: '1/2 OZ', weight: 15.55, certificate: 70 },
+                '1oz': { name: '1 OZ', weight: 31.1035, certificate: 160 },
+                '1tola': { name: '1 TOLA', weight: 11.664, certificate: 60 },
+                '2tola': { name: '2 TOLA', weight: 23.328, certificate: 70 },
+                '3tola': { name: '3 TOLA', weight: 34.992, certificate: 80 },
+                '5tola': { name: '5 TOLA', weight: 58.32, certificate: 120 }
+            };
+            
+            // Update datetime
+            function updateDateTime() {
+                const now = new Date();
+                const options = { 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric',
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    second: '2-digit'
+                };
+                currentDatetime.textContent = now.toLocaleDateString('en-US', options);
+            }
+            
+            // Initial calculation
+            updateDateTime();
+            updateItemDetails();
+            calculatePrices();
+            
+            // Update datetime every second
+            setInterval(updateDateTime, 1000);
+            
+            // Event listeners
+            calculateBtn.addEventListener('click', function() {
+                calculatePrices();
+                addToHistory();
+            });
+            
+            itemSelect.addEventListener('change', function() {
+                updateItemDetails();
+                calculatePrices();
+            });
+            
+            baseValueInput.addEventListener('input', calculatePrices);
+            premiumInput.addEventListener('input', calculatePrices);
+            
+            // Toggle certificate section
+            toggleCertificateBtn.addEventListener('click', function() {
+                certificateSection.classList.toggle('visible');
+                if (certificateSection.classList.contains('visible')) {
+                    toggleCertificateBtn.innerHTML = '<i class="fas fa-eye-slash"></i> Hide Certificates';
+                } else {
+                    toggleCertificateBtn.innerHTML = '<i class="fas fa-edit"></i> Edit Certificates';
+                }
+            });
+            
+            // Add event listeners to certificate inputs
+            for (const itemKey in items) {
+                const certInput = document.getElementById(`cert-${itemKey}`);
+                if (certInput) {
+                    certInput.addEventListener('input', function() {
+                        items[itemKey].certificate = parseFloat(this.value) || 0;
+                        if (itemSelect.value === itemKey) {
+                            updateItemDetails();
+                            calculatePrices();
+                        }
+                    });
+                }
+            }
+            
+            function updateItemDetails() {
+                const selectedItem = itemSelect.value;
+                const item = items[selectedItem];
+                
+                document.getElementById('item-name').textContent = item.name;
+                document.getElementById('item-weight').textContent = item.weight;
+                document.getElementById('certificate-charge').textContent = item.certificate;
+                document.getElementById('display-base-value').textContent = baseValueInput.value;
+                document.getElementById('display-premium').textContent = premiumInput.value;
+                
+                // Update certificate input value for selected item
+                const certInput = document.getElementById(`cert-${selectedItem}`);
+                if (certInput) {
+                    certInput.value = item.certificate;
+                }
+            }
+            
+            function calculatePrices() {
+                const baseValue = parseFloat(baseValueInput.value) || 3333;
+                const premium = parseFloat(premiumInput.value) || 0;
+                const selectedItem = itemSelect.value;
+                const item = items[selectedItem];
+                
+                // Update displayed values
+                document.getElementById('display-base-value').textContent = baseValue;
+                document.getElementById('display-premium').textContent = premium;
+                
+                // Calculate dollar per gram (based on Excel formula: =(baseValue+premium)/31.1035)
+                const dollarPerGram = (baseValue + premium) / 31.1035;
+                
+                // Calculate AED per gram (dollarPerGram * 3.674)
+                const aedPerGram = dollarPerGram * 3.674;
+                document.getElementById('aed-gram').textContent = aedPerGram.toFixed(2);
+                
+                // Calculate gold value
+                const goldValue = aedPerGram * item.weight;
+                
+                // Certificate value
+                document.getElementById('certificate-value').textContent = item.certificate;
+                
+                // Calculate total price
+                const totalPrice = goldValue + item.certificate;
+                document.getElementById('total-price').textContent = totalPrice.toFixed(2);
+            }
+            
+            function addToHistory() {
+                const now = new Date();
+                const options = { 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric',
+                    hour: '2-digit', 
+                    minute: '2-digit'
+                };
+                const datetime = now.toLocaleDateString('en-US', options);
+                const selectedItem = itemSelect.value;
+                const item = items[selectedItem];
+                const baseValue = parseFloat(baseValueInput.value) || 3333;
+                const premium = parseFloat(premiumInput.value) || 0;
+                const totalPrice = document.getElementById('total-price').textContent;
+                
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `
+                    <td>${datetime}</td>
+                    <td>${item.name}</td>
+                    <td>${baseValue}</td>
+                    <td>${premium}</td>
+                    <td>${item.certificate}</td>
+                    <td>${totalPrice}</td>
+                `;
+                
+                // Add new row at the beginning of the table
+                historyBody.insertBefore(newRow, historyBody.firstChild);
+                
+                // Limit history to 10 entries
+                if (historyBody.children.length > 10) {
+                    historyBody.removeChild(historyBody.lastChild);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
